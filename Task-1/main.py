@@ -172,7 +172,7 @@ def normalize_stars(v):
 # --------------------
 # Evaluation pipeline
 # --------------------
-def evaluate(df, n=20, repeats=3, out_dir="outputs"):
+def evaluate(df, n=200, repeats=3, out_dir="outputs"):
     df = df.head(n).reset_index(drop=True)
 
     results = []  # rows for final CSV
