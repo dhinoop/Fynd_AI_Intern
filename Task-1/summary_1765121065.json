@@ -1,0 +1,23 @@
+[
+  {
+    "prompt_style": "zero_shot",
+    "accuracy": 0.75,
+    "json_validity_rate": 0.967,
+    "avg_consistency": 0.967,
+    "num_examples": 20
+  },
+  {
+    "prompt_style": "few_shot",
+    "accuracy": 0.7,
+    "json_validity_rate": 0.983,
+    "avg_consistency": 1.0,
+    "num_examples": 20
+  },
+  {
+    "prompt_style": "hidden_cot",
+    "accuracy": 0.6,
+    "json_validity_rate": 0.317,
+    "avg_consistency": 0.775,
+    "num_examples": 20
+  }
+]
