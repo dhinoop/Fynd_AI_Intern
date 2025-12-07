@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Feedback</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>User Feedback</h1>
+
+    <label>Rating (1–5)</label>
+    <select id="rating">
+        <option>5</option>
+        <option>4</option>
+        <option>3</option>
+        <option>2</option>
+        <option>1</option>
+    </select>
+
+    <label>Write Review</label>
+    <textarea id="review" rows="4"></textarea>
+
+    <button id="submitBtn">Submit</button>
+
+    <div id="responseBox" style="display:none;">
+        <h3>AI Response:</h3>
+        <div id="aiReply"></div>
+    </div>
+
+    <script>
+document.getElementById("submitBtn").addEventListener("click", async () => {
+    const rating = document.getElementById("rating").value;
+    const review = document.getElementById("review").value;
+
+    const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            rating: rating,
+            review: review
+        })
+    });
+
+    const data = await res.json();
+    document.getElementById("aiReply").innerText = data.ai_reply;
+    document.getElementById("responseBox").style.display = "block";
+});
+</script>
+
+</body>
+</html>
