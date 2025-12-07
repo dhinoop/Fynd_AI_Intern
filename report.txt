@@ -1,196 +1,110 @@
-Final Summary for Task-1 Report
-Overview
+Task-1: Review Classification Using LLM Prompting
+Objective
 
-The goal of Task-1 was to classify Yelp reviews into a 1–5 star rating using prompt-based approaches. Three prompting strategies were implemented:
-
-Zero-Shot Prompting
-
-Few-Shot Prompting
-
-Hidden Chain-of-Thought (Hidden-CoT)
-
-Each model response was required to return strictly formatted JSON:
+Predict a Yelp review’s star rating (1–5) using prompt-based LLM inference, returning strictly formatted JSON:
 
 {
   "predicted_stars": <number>,
   "explanation": "<brief reasoning>"
 }
 
-Implementation Notes
-Attempted API-based LLMs (Gemini 1.5 & 2.0)
+Prompting Approaches Implemented
 
-Initially, the system was built using Google Gemini API.
+Zero-Shot Prompting
+Direct instruction to classify without examples.
 
-Faced significant obstacles:
+Few-Shot Prompting
+Included sample labeled reviews to guide the model.
 
-Free-tier request quota exceeded frequently.
+Hidden Chain-of-Thought (CoT)
+Asked model to “think step-by-step but hide reasoning”, returning only JSON.
 
-Model version mismatches (404 model not found).
+Implementation Journey & Decisions
+Initial Approach: Google Gemini API
 
-Missing parameters (max_output_tokens deprecated).
+Multiple technical obstacles were encountered:
 
-API rate-limit delays (>60 seconds).
+Free-tier quota exhausted quickly for 200+ samples
 
-These issues made API-based experiments unreliable for a 200-sample dataset.
+Model version errors (404 – model not found)
 
-→ Decision: Switch entirely to local LLM inference using Ollama + LLaMA 3.
+Token-limit mismatch (max_output_tokens deprecated)
 
-Switch to Local LLAMA3 (Ollama)
-Why local LLM?
+Slow rate limits → 60s+ delays
 
-No rate limits.
+JSON occasionally malformed
 
-Faster iteration cycle.
+Conclusion: API-based approach was unstable and too slow for the dataset size.
 
-More control over output formatting.
+Final Approach: Local LLaMA 3 (Ollama)
 
-Reproducible behavior.
+Switched to local inference for speed, reliability, and unlimited usage.
 
-Challenges solved:
+Key fixes implemented:
 
-ANSI spinner characters removed using regex.
+Removed ANSI spinner characters from Ollama’s streaming output
 
-JSON extraction improved with robust parsing.
+Robust JSON cleaning/extraction
 
-Prompts adjusted with escaped braces {} to avoid formatting conflicts.
+Escaped {} braces inside f-strings
 
-Needed to sanitize multiline text for CSV.
+Sanitized multi-line text for CSV
 
-Ensured output contained "predicted_stars" and "explanation".
+Ensured all responses contained "predicted_stars" and "explanation"
 
-Sampling Strategy
+Task-2: Two-Dashboard AI Feedback System
+Objective
 
-Full dataset has >1M records → too slow for local inference.
+Build a fully functional web application with:
 
-Running 200 samples locally took too much time, as LLAMA3 needed ~8–12 seconds per review depending on prompt.
+User Dashboard:
+Users submit review + star rating → receive an AI-generated reply.
 
-To meet time constraints, we processed 20 sampled reviews for final evaluation.
+Admin Dashboard:
+Shows all submissions live, including:
 
-*********************************************************************************************************************************
+Rating
 
-Task 2 – Two-Dashboard AI Feedback System
+Review
 
-(Using LLaMA via Ollama — Final Summary)**
+AI Summary
 
-1. Objective
+AI Recommended Actions
 
-The goal of Task-2 was to design, build, and deploy a complete AI-powered web feedback system with:
+Basic analytics (total reviews, average rating)
 
-A public user dashboard for collecting ratings and text reviews.
+Both dashboards use the same JSON storage for consistency.
 
-An internal admin dashboard for viewing feedback, AI summaries, and recommended actions.
+| Component  | Technology                      |
+| ---------- | ------------------------------- |
+| Backend    | Python Flask + SSE              |
+| LLM        | **Groq LLaMA 3.1 (8B Instant)** |
+| Storage    | JSON file                       |
+| Deployment | Docker + Render Web Service     |
+| Frontend   | HTML, CSS, JavaScript           |
 
-AI automation using a Large Language Model (LLaMA).
 
-Shared data storage between both dashboards.
+AI Generation Logic
 
-Full online deployment so both dashboards are accessible publicly.
+User-facing Reply:
+Short friendly message based on rating + review.
 
-2. Technology Stack
-✔ Backend
+Admin Summary:
+LLaMA produces a single-sentence summary.
 
-Flask (Python)
+Next Actions:
+Recommends 2–3 improvements for the business.
 
-Ollama (LLaMA 3) for local AI inference
+Key Features
 
-Server-Sent Events (SSE) for real-time admin updates
+Server-Sent Events (SSE) for live updates on admin page
 
-Data stored in a JSON file (reviews.json)
+Password-protected admin URL (/admin?pwd=admin123)
 
-✔ Frontend
+Fully containerized (Dockerfile + requirements.txt)
 
-HTML + CSS + Vanilla JavaScript
+Online deployment via Render
 
-Two pages:
+Robust fallback behavior if no API key is present
 
-user.html
-
-admin.html
-
-✔ LLM Used
-
-The application uses:
-
-LLaMA 3 via Ollama (Local LLM Runtime)
-
-All AI tasks are handled locally:
-
-User-facing responses
-
-Review summarization
-
-Recommended next actions
-
-This avoids rate-limits, ensures privacy, and removes cloud dependency.
-
-3. Features Implemented
-A. User Dashboard (Public-Facing)
-
-Users can:
-
-Select a rating (1–5)
-
-Submit a written review
-
-Receive an AI-generated reply created by LLaMA
-
-Automatically store the review in reviews.json
-
-B. Admin Dashboard (Internal-Facing)
-
-Admins can:
-
-Access dashboard via URL:
-/admin?pwd=YOUR_PASSWORD
-
-View all reviews with:
-
-User rating
-
-User’s review text
-
-AI-generated summary
-
-AI-suggested next actions
-
-See live updates (new reviews appear instantly via SSE)
-
-View analytics, including:
-
-Rating distribution chart
-
-Recent review trends
-
-4. Data Storage
-
-Both dashboards read/write from the same file:
-
-data/reviews.json
-
-5. Deployment
-
-Both dashboards were deployed as a single Flask web app using:
-
-✔ Render Web Service (Online Deployment)
-
-This achieved:
-
-Public URL for User dashboard
-
-Public URL for Admin dashboard
-
-Environment variables stored securely on Render
-
-LLaMA running on the backend machine (Ollama installed)
-
-Thus, both dashboards are fully live and accessible online, as required.
-
-6. Final Outcome
-
-Task-2 is successfully completed, delivering a:
-
-✔ Fully functional, AI-driven feedback system
-✔ User dashboard + Admin dashboard
-✔ Local LLaMA-based AI pipeline
-✔ Real-time updates
-✔ Online deployment of both dashboards
+Latest supported Groq model used (groq/llama-3.1-8b-instant)
